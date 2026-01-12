@@ -87,7 +87,7 @@ const Contact = () => {
           {/* SOCIAL LINKS */}
           <div className="flex gap-6 mt-8">
             <a
-              href="https://github.com/yourgithub"
+              href="https://github.com/praivatedev"
               target="_blank"
               rel="noreferrer"
               className="text-gray-400 hover:text-blue-400 transition-colors"
@@ -95,7 +95,7 @@ const Contact = () => {
               <Github size={26} />
             </a>
             <a
-              href="https://linkedin.com/in/yourlinkedin"
+              href="https://www.linkedin.com/in/peter-gonye-0bba14246/"
               target="_blank"
               rel="noreferrer"
               className="text-gray-400 hover:text-blue-400 transition-colors"
@@ -103,7 +103,7 @@ const Contact = () => {
               <Linkedin size={26} />
             </a>
             <a
-              href="https://instagram.com/yourinstagram"
+              href="https://instagram.com/m16n1ghtg"
               target="_blank"
               rel="noreferrer"
               className="text-gray-400 hover:text-blue-400 transition-colors"
