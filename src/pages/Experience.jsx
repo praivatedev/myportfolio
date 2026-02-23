@@ -14,22 +14,71 @@ const Experience = () => {
     const fetchExperience = async () => {
       try {
         const res = await axios.get(`${BASE_URL}/experience/list`);
-        setExperienceList(res.data);
+        setExperienceList(res.data.experiences || res.data);
       } catch (err) {
         setError("Error fetching experience data.");
       } finally {
         setLoading(false);
       }
     };
+
     fetchExperience();
   }, []);
+
+  /* =====================================================
+     🔥 SKELETON LOADER (NEW PROFESSIONAL VERSION)
+  ===================================================== */
+
+  const SkeletonLoader = () => {
+    return (
+      <div className="relative max-w-5xl mx-auto mt-10">
+        {[1, 2, 3].map((item) => (
+          <div key={item} className="relative mb-16 flex items-center">
+            
+            {/* Timeline Line */}
+            <div className="absolute left-1/2 transform -translate-x-1/2 w-[2px] h-full bg-gray-800"></div>
+
+            {/* Timeline Dot */}
+            <div className="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-gray-700 border-4 border-gray-900 z-10"></div>
+
+            {/* Card Skeleton */}
+            <div className="w-full md:w-1/2 mx-auto">
+              <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-6 animate-pulse">
+                
+                {/* Title */}
+                <div className="h-6 bg-gray-800 rounded w-3/4 mb-4"></div>
+
+                {/* Position */}
+                <div className="h-4 bg-gray-800 rounded w-1/2 mb-3"></div>
+
+                {/* Date */}
+                <div className="h-4 bg-gray-800 rounded w-2/3 mb-3"></div>
+
+                {/* Location */}
+                <div className="h-4 bg-gray-800 rounded w-1/3 mb-4"></div>
+
+                {/* Tech Pills */}
+                <div className="flex gap-2">
+                  <div className="h-6 w-16 bg-gray-800 rounded-full"></div>
+                  <div className="h-6 w-20 bg-gray-800 rounded-full"></div>
+                  <div className="h-6 w-12 bg-gray-800 rounded-full"></div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <section
       id="experience"
       className="relative min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-white py-24 px-6 overflow-hidden"
     >
-      {/* Background glow */}
+      {/* Background Glow */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.15),transparent_70%)]"></div>
 
       {/* Title */}
@@ -42,26 +91,14 @@ const Experience = () => {
         Professional Experience
       </motion.h2>
 
-      {/* Loading */}
-      {loading && (
-        <div className="flex flex-col justify-center items-center h-60 gap-6">
-          <motion.div
-            className="w-14 h-14 border-4 border-t-transparent border-blue-500 rounded-full shadow-lg shadow-blue-500/30"
-            animate={{ rotate: 360 }}
-            transition={{
-              repeat: Infinity,
-              duration: 1.2,
-              ease: "linear",
-            }}
-          />
-          <p className="text-gray-400 text-lg font-medium animate-pulse">
-            Loading experience...
-          </p>
-        </div>
-      )}
+      {/* ========================= */}
+      {/* 🔥 LOADING STATE */}
+      {/* ========================= */}
+
+      {loading && <SkeletonLoader />}
 
       {/* Error */}
-      {error && (
+      {!loading && error && (
         <p className="text-center text-red-400 font-medium">{error}</p>
       )}
 
@@ -89,6 +126,7 @@ const Experience = () => {
                 } mt-10 md:mt-0`}
               >
                 <div className="bg-gray-900/50 border border-blue-400/20 rounded-2xl p-6 backdrop-blur-xl shadow-md hover:shadow-blue-500/20 hover:-translate-y-2 transition-all duration-300">
+                  
                   <div className="flex items-center gap-3 mb-3">
                     <Briefcase className="text-blue-400 w-6 h-6" />
                     <h3 className="text-2xl font-semibold text-blue-300">
@@ -150,7 +188,7 @@ const Experience = () => {
         </div>
       )}
 
-      {/* Empty */}
+      {/* Empty State */}
       {!loading && experienceList.length === 0 && !error && (
         <p className="text-center text-gray-500 mt-10">
           No experience records found.
