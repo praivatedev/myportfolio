@@ -32,7 +32,6 @@ const Projects = () => {
     fetchProjects();
   }, []);
 
-  // Memoized project rendering (prevents unnecessary recalculation)
   const renderedProjects = useMemo(() => {
     return projects.map((project, index) => (
       <motion.div
@@ -72,7 +71,6 @@ const Projects = () => {
             {project.description}
           </p>
 
-          {/* Technologies */}
           {project.technologies?.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-3">
               {project.technologies.map((tech, i) => (
@@ -86,7 +84,6 @@ const Projects = () => {
             </div>
           )}
 
-          {/* Features */}
           {project.features?.length > 0 && (
             <ul className="text-gray-400 list-disc ml-6 mt-3 space-y-1 text-sm">
               {project.features.map((feature, i) => (
@@ -95,7 +92,6 @@ const Projects = () => {
             </ul>
           )}
 
-          {/* Links */}
           <div className="flex space-x-6 pt-4">
             {project.githubLink && (
               <a
@@ -131,7 +127,6 @@ const Projects = () => {
       id="projects"
       className="relative min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-white py-24 px-4 sm:px-10"
     >
-      {/* Title */}
       <motion.h2
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -141,23 +136,29 @@ const Projects = () => {
         Featured Projects
       </motion.h2>
 
-      {/* Loading Skeleton */}
-      {loading ? (
+      {/* ✅ Loading State */}
+      {loading && (
         <div className="flex flex-col space-y-10 max-w-6xl mx-auto animate-pulse">
           {[1, 2, 3].map((_, i) => (
-            <div
-              key={i}
-              className="h-72 bg-gray-800 rounded-3xl"
-            ></div>
+            <div key={i} className="h-72 bg-gray-800 rounded-3xl"></div>
           ))}
         </div>
-      ) : (
+      )}
+
+      {/* ✅ Empty State */}
+      {!loading && projects.length === 0 && (
+        <div className="text-center text-gray-400 text-lg">
+          No projects available yet.
+        </div>
+      )}
+
+      {/* ✅ Projects Render */}
+      {!loading && projects.length > 0 && (
         <div className="flex flex-col space-y-32 relative z-10 max-w-6xl mx-auto">
           {renderedProjects}
         </div>
       )}
 
-      {/* Divider */}
       <div className="w-56 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mt-28 rounded-full"></div>
     </section>
   );
