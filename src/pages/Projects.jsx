@@ -12,25 +12,26 @@ const Projects = () => {
   const BASE_URL = "https://curicullum.onrender.com/api";
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchProjects = async () => {
       try {
         setLoading(true);
 
-        const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 8000);
 
         const res = await fetch(`${BASE_URL}/project/list`, {
           signal: controller.signal,
         });
 
+        clearTimeout(timeout);
+
         if (!res.ok) {
           throw new Error("Failed to fetch projects");
         }
 
         const data = await res.json();
-        setProjects(data);
-
-        clearTimeout(timeout);
+        setProjects(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Error fetching projects:", err);
         setError("Failed to load projects. Please try again.");
@@ -40,6 +41,8 @@ const Projects = () => {
     };
 
     fetchProjects();
+
+    return () => controller.abort();
   }, []);
 
   const renderedProjects = useMemo(() => {
@@ -50,15 +53,16 @@ const Projects = () => {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         viewport={{ once: true, amount: 0.2 }}
-        className={`flex flex-col md:flex-row items-center ${index % 2 !== 0 ? "md:flex-row-reverse" : ""
-          } gap-8 md:gap-16`}
+        className={`flex flex-col md:flex-row items-center ${
+          index % 2 !== 0 ? "md:flex-row-reverse" : ""
+        } gap-8 md:gap-16`}
       >
         {/* Image */}
         <div className="relative w-full md:w-1/2">
-          {project.image ? (
+          {project?.image ? (
             <img
               src={project.image}
-              alt={project.title}
+              alt={project.title || "Project"}
               loading="lazy"
               className="w-full h-72 md:h-96 object-cover rounded-3xl shadow-lg transition-transform duration-500 hover:scale-105"
             />
@@ -72,36 +76,41 @@ const Projects = () => {
         {/* Content */}
         <div className="w-full md:w-1/2 space-y-4">
           <h3 className="text-3xl md:text-4xl font-bold text-blue-400">
-            {project.title}
+            {project?.title || "Untitled Project"}
           </h3>
 
           <p className="text-gray-300 text-base leading-relaxed">
-            {project.description}
+            {project?.description || "No description available."}
           </p>
 
-          {project.technologies?.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {project.technologies.map((tech) => (
-                <span
-                  key={i}
-                  className="bg-blue-500/10 text-blue-300 border border-blue-500/20 px-3 py-1 rounded-full text-sm"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
-          )}
+          {/* Technologies */}
+          {Array.isArray(project?.technologies) &&
+            project.technologies.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {project.technologies.map((tech, i) => (
+                  <span
+                    key={i}
+                    className="bg-blue-500/10 text-blue-300 border border-blue-500/20 px-3 py-1 rounded-full text-sm"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            )}
 
-          {project.features?.length > 0 && (
-            <ul className="text-gray-400 list-disc ml-6 space-y-1 text-sm">
-              {project.features.map((feature) => (
-                <li key={i}>{feature}</li>
-              ))}
-            </ul>
-          )}
+          {/* Features */}
+          {Array.isArray(project?.features) &&
+            project.features.length > 0 && (
+              <ul className="text-gray-400 list-disc ml-6 space-y-1 text-sm">
+                {project.features.map((feature, i) => (
+                  <li key={i}>{feature}</li>
+                ))}
+              </ul>
+            )}
 
+          {/* Links */}
           <div className="flex space-x-6 pt-4">
-            {project.githubLink && (
+            {project?.githubLink && (
               <a
                 href={project.githubLink}
                 target="_blank"
@@ -113,7 +122,7 @@ const Projects = () => {
               </a>
             )}
 
-            {project.demoLink && (
+            {project?.demoLink && (
               <a
                 href={project.demoLink}
                 target="_blank"
@@ -144,15 +153,15 @@ const Projects = () => {
       </motion.h2>
 
       {/* 🔄 Loading */}
-      <div className="flex justify-center items-center h-64">
-        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
+      {loading && (
+        <div className="flex justify-center items-center h-64">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
 
       {/* ❌ Error */}
       {!loading && error && (
-        <div className="text-center text-red-400 text-lg">
-          {error}
-        </div>
+        <div className="text-center text-red-400 text-lg">{error}</div>
       )}
 
       {/* 📭 Empty */}
