@@ -1,16 +1,21 @@
+"use client";
+
 import React, { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Github, Globe } from "lucide-react";
 
 const Projects = () => {
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const BASE_URL = "https://curicullum.onrender.com/api";
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
+        setLoading(true);
+
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 8000);
 
@@ -18,12 +23,17 @@ const Projects = () => {
           signal: controller.signal,
         });
 
+        if (!res.ok) {
+          throw new Error("Failed to fetch projects");
+        }
+
         const data = await res.json();
         setProjects(data);
 
         clearTimeout(timeout);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
+      } catch (err) {
+        console.error("Error fetching projects:", err);
+        setError("Failed to load projects. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -44,24 +54,23 @@ const Projects = () => {
           index % 2 !== 0 ? "md:flex-row-reverse" : ""
         } gap-8 md:gap-16`}
       >
-        {/* Image Section */}
+        {/* Image */}
         <div className="relative w-full md:w-1/2">
           {project.image ? (
             <img
               src={project.image}
               alt={project.title}
               loading="lazy"
-              decoding="async"
               className="w-full h-72 md:h-96 object-cover rounded-3xl shadow-lg transition-transform duration-500 hover:scale-105"
             />
           ) : (
-            <div className="w-full h-72 md:h-96 rounded-3xl bg-gradient-to-r from-blue-900 to-purple-900 flex items-center justify-center text-gray-300">
+            <div className="w-full h-72 md:h-96 rounded-3xl bg-gray-800 flex items-center justify-center text-gray-400">
               No Image
             </div>
           )}
         </div>
 
-        {/* Text Section */}
+        {/* Content */}
         <div className="w-full md:w-1/2 space-y-4">
           <h3 className="text-3xl md:text-4xl font-bold text-blue-400">
             {project.title}
@@ -72,8 +81,8 @@ const Projects = () => {
           </p>
 
           {project.technologies?.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-3">
-              {project.technologies.map((tech, i) => (
+            <div className="flex flex-wrap gap-2">
+              {project.technologies.map((tech: string, i: number) => (
                 <span
                   key={i}
                   className="bg-blue-500/10 text-blue-300 border border-blue-500/20 px-3 py-1 rounded-full text-sm"
@@ -85,8 +94,8 @@ const Projects = () => {
           )}
 
           {project.features?.length > 0 && (
-            <ul className="text-gray-400 list-disc ml-6 mt-3 space-y-1 text-sm">
-              {project.features.map((feature, i) => (
+            <ul className="text-gray-400 list-disc ml-6 space-y-1 text-sm">
+              {project.features.map((feature: string, i: number) => (
                 <li key={i}>{feature}</li>
               ))}
             </ul>
@@ -98,7 +107,7 @@ const Projects = () => {
                 href={project.githubLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-gray-300 hover:text-blue-400 transition-colors"
+                className="flex items-center gap-2 text-gray-300 hover:text-blue-400 transition"
               >
                 <Github className="w-5 h-5" />
                 <span>Code</span>
@@ -110,7 +119,7 @@ const Projects = () => {
                 href={project.demoLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-gray-300 hover:text-purple-400 transition-colors"
+                className="flex items-center gap-2 text-gray-300 hover:text-purple-400 transition"
               >
                 <Globe className="w-5 h-5" />
                 <span>Live Demo</span>
@@ -125,36 +134,47 @@ const Projects = () => {
   return (
     <section
       id="projects"
-      className="relative min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-white py-24 px-4 sm:px-10"
+      className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-white py-24 px-4 sm:px-10"
     >
       <motion.h2
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
         className="text-5xl md:text-6xl font-bold text-center mb-20 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
       >
         Featured Projects
       </motion.h2>
 
-      {/* ✅ Loading State */}
+      {/* 🔄 Loading */}
       {loading && (
-        <div className="flex flex-col space-y-10 max-w-6xl mx-auto animate-pulse">
+        <div className="flex flex-col space-y-10 max-w-6xl mx-auto">
           {[1, 2, 3].map((_, i) => (
-            <div key={i} className="h-72 bg-gray-800 rounded-3xl"></div>
+            <div
+              key={i}
+              className="h-72 bg-gray-800 rounded-3xl animate-pulse flex items-center justify-center"
+            >
+              Loading projects...
+            </div>
           ))}
         </div>
       )}
 
-      {/* ✅ Empty State */}
-      {!loading && projects.length === 0 && (
+      {/* ❌ Error */}
+      {!loading && error && (
+        <div className="text-center text-red-400 text-lg">
+          {error}
+        </div>
+      )}
+
+      {/* 📭 Empty */}
+      {!loading && !error && projects.length === 0 && (
         <div className="text-center text-gray-400 text-lg">
           No projects available yet.
         </div>
       )}
 
-      {/* ✅ Projects Render */}
-      {!loading && projects.length > 0 && (
-        <div className="flex flex-col space-y-32 relative z-10 max-w-6xl mx-auto">
+      {/* ✅ Success */}
+      {!loading && !error && projects.length > 0 && (
+        <div className="flex flex-col space-y-32 max-w-6xl mx-auto">
           {renderedProjects}
         </div>
       )}
