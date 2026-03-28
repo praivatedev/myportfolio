@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Github, Globe } from "lucide-react";
 
 const Projects = () => {
-  const [projects, setProjects] = useState<any[]>([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -50,9 +50,8 @@ const Projects = () => {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         viewport={{ once: true, amount: 0.2 }}
-        className={`flex flex-col md:flex-row items-center ${
-          index % 2 !== 0 ? "md:flex-row-reverse" : ""
-        } gap-8 md:gap-16`}
+        className={`flex flex-col md:flex-row items-center ${index % 2 !== 0 ? "md:flex-row-reverse" : ""
+          } gap-8 md:gap-16`}
       >
         {/* Image */}
         <div className="relative w-full md:w-1/2">
@@ -82,7 +81,7 @@ const Projects = () => {
 
           {project.technologies?.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {project.technologies.map((tech: string, i: number) => (
+              {project.technologies.map((tech) => (
                 <span
                   key={i}
                   className="bg-blue-500/10 text-blue-300 border border-blue-500/20 px-3 py-1 rounded-full text-sm"
@@ -95,7 +94,7 @@ const Projects = () => {
 
           {project.features?.length > 0 && (
             <ul className="text-gray-400 list-disc ml-6 space-y-1 text-sm">
-              {project.features.map((feature: string, i: number) => (
+              {project.features.map((feature) => (
                 <li key={i}>{feature}</li>
               ))}
             </ul>
@@ -145,18 +144,9 @@ const Projects = () => {
       </motion.h2>
 
       {/* 🔄 Loading */}
-      {loading && (
-        <div className="flex flex-col space-y-10 max-w-6xl mx-auto">
-          {[1, 2, 3].map((_, i) => (
-            <div
-              key={i}
-              className="h-72 bg-gray-800 rounded-3xl animate-pulse flex items-center justify-center"
-            >
-              Loading projects...
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="flex justify-center items-center h-64">
+        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
 
       {/* ❌ Error */}
       {!loading && error && (
